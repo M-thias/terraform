@@ -13,8 +13,12 @@ provider "azurerm" {
   tenant_id       = "1c35a44e-5d03-4d18-953c-ba19e8d10bcf"
 }
 
+variable "env" {
+  description = "Set Environment"
+}
+
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-terraform-ltoa"
+  name     = "rg-${var.env}-terraform-ltoa"
   location = "East US"
   tags = {
     environment = "Development"
@@ -23,7 +27,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = "vnet-terraform-ltoa"
+  name                = "vnet-${var.env}-terraform-ltoa"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   address_space       = ["10.0.0.0/16","10.1.0.0/16"]
@@ -34,7 +38,7 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "sn" {
-  name                 = "subnet-terraform-ltoa"
+  name                 = "subnet-${var.env}-terraform-ltoa"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.1.1.0/24"]
