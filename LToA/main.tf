@@ -1,3 +1,5 @@
+/* About one hour into the video, continue on soon, this is good stuff */
+
 terraform {
   required_providers {
     azurerm = {
