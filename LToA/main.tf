@@ -19,24 +19,40 @@ variable "env" {
   description = "Set Environment"
 }
 
+variable "region" {
+  description = "Set Region"
+  validation {
+    condition     = contains(["eastus", "westus", "centralus"], replace(lower(var.region), " ", ""))
+    error_message = "Region must be one of: East US, West US, Central US"
+  }
+}
+
+locals {
+  common_tags = {
+    environment  = "Development"
+    mattymood    = "good"
+    owner        = "mrysse@outlook.com"
+    costcenter   = "12345"
+    creationtime = "2026-01-01T00:00:00Z"
+    creator      = "mrysse@outlook.com"
+    creatortype  = "user"
+    region       = var.region
+  }
+  network_address = ["10.0.0.0/16", "10.1.0.0/16"]
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = "rg-${var.env}-terraform-ltoa"
-  location = "East US"
-  tags = {
-    environment = "Development"
-    mattymood = "good"
-  }
+  location = var.region
+  tags = local.common_tags
 }
 
 resource "azurerm_virtual_network" "vnet" {
   name                = "vnet-${var.env}-terraform-ltoa"
-  location            = azurerm_resource_group.rg.location
+  location            = var.region
   resource_group_name = azurerm_resource_group.rg.name
-  address_space       = ["10.0.0.0/16","10.1.0.0/16"]
-  tags = {
-    environment = "Development"
-    mattymood = azurerm_resource_group.rg.tags.mattymood
-  }
+  address_space       = local.network_address
+  tags                = azurerm_resource_group.rg.tags
 }
 
 resource "azurerm_subnet" "sn" {
